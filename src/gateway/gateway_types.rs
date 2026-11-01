@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,12 +32,14 @@ pub struct DeliveryReceipt {
     pub error: Option<String>,
 }
 
+#[async_trait]
 pub trait Adapter: Send + Sync {
     fn name(&self) -> &str;
-    fn send(&self, chat_id: &str, message: OutgoingMessage) -> std::pin::Pin<Box<dyn std::future::Future<Output = anyhow::Result<DeliveryReceipt>> + Send>>;
-    fn poll_updates(&self) -> std::pin::Pin<Box<dyn std::future::Future<Output = anyhow::Result<Vec<ChannelEnvelope>>> + Send>>;
+    async fn send(&self, chat_id: &str, message: OutgoingMessage) -> anyhow::Result<DeliveryReceipt>;
+    async fn poll_updates(&self) -> anyhow::Result<Vec<ChannelEnvelope>>;
 }
 
+#[derive(Clone, Debug)]
 pub struct GatewayClient {
     pub base_url: String,
     pub token: Option<String>,
