@@ -105,7 +105,7 @@ async fn api_chat(
     State(state): State<GatewayState>,
     Json(req): Json<ChatRequest>,
 ) -> Json<serde_json::Value> {
-    let message = OutgoingMessage::Text { text: req.text };
+    let message = OutgoingMessage::Text { text: req.text.clone() };
     let mut receipt: Option<DeliveryReceipt> = None;
     for adapter in state.adapters.iter() {
         if adapter.name() == req.channel {
@@ -113,6 +113,7 @@ async fn api_chat(
             break;
         }
     }
+    let _ = state.tx.send(serde_json::json!({"channel": req.channel, "chat_id": req.chat_id, "receipt": receipt}).to_string());
     Json(serde_json::json!({"ok": receipt.is_some(), "receipt": receipt}))
 }
 
