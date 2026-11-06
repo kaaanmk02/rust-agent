@@ -1,10 +1,21 @@
+pub mod adapters;
+pub mod auth;
+pub mod cli;
 pub mod gateway_config;
 pub mod gateway_types;
-pub mod server;
-pub mod adapters;
-pub mod cli;
+pub mod mcp_adapter;
 pub mod middleware;
+pub mod server;
 pub mod ws;
+pub mod audit;
+pub mod webhooks;
+
+pub use gateway_types::{GatewayClient, ChannelEnvelope, DeliveryReceipt, IncomingMessage, OutgoingMessage};
+pub mod conversation_state;
+pub mod config_hot_reload;
 pub use gateway_config::GatewayConfig;
-pub use gateway_types::{GatewayClient, Adapter, ChannelEnvelope, DeliveryReceipt, IncomingMessage, OutgoingMessage};
 pub use server::GatewayState;
+pub mod multi_agent;
+pub mod security;
+pub mod timeout_middleware;
+pub mod logging;

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use crate::queue::QueueConfig;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GatewayConfig {
@@ -10,6 +11,7 @@ pub struct GatewayConfig {
     pub discord: Option<DiscordConfig>,
     pub slack: Option<SlackConfig>,
     pub mcp: Option<McpConfig>,
+    pub queue: Option<QueueConfig>,
 }
 
 impl Default for GatewayConfig {
@@ -23,6 +25,7 @@ impl Default for GatewayConfig {
             discord: None,
             slack: None,
             mcp: None,
+            queue: None,
         }
     }
 }
@@ -32,6 +35,7 @@ pub struct TelegramConfig {
     pub enabled: bool,
     pub bot_token: String,
     pub allowed_user_ids: Vec<i64>,
+    pub last_update_id: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -47,6 +51,7 @@ pub struct DiscordConfig {
     pub enabled: bool,
     pub bot_token: String,
     pub application_id: String,
+    pub channel_id: String,
     pub guild_id: Option<String>,
 }
 
@@ -56,6 +61,7 @@ pub struct SlackConfig {
     pub bot_token: String,
     pub signing_secret: String,
     pub app_token: String,
+    pub channel_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,8 +90,32 @@ mod tests {
             enabled: true,
             bot_token: "123:ABC".into(),
             allowed_user_ids: vec![1, 2],
+            last_update_id: None,
+        });
+        cfg.discord = Some(DiscordConfig {
+            enabled: true,
+            bot_token: "x".into(),
+            application_id: "y".into(),
+            channel_id: "z".into(),
+            guild_id: None,
+        });
+        cfg.slack = Some(SlackConfig {
+            enabled: true,
+            bot_token: "x".into(),
+            signing_secret: "y".into(),
+            app_token: "z".into(),
+            channel_id: "c".into(),
+        });
+        cfg.whatsapp = Some(WhatsAppConfig {
+            enabled: true,
+            session_name: "s".into(),
+            endpoint: "http://e".into(),
+            api_key: "k".into(),
         });
         assert!(cfg.telegram.as_ref().unwrap().enabled);
         assert_eq!(cfg.telegram.as_ref().unwrap().allowed_user_ids.len(), 2);
+        assert_eq!(cfg.discord.as_ref().unwrap().channel_id, "z");
+        assert_eq!(cfg.slack.as_ref().unwrap().channel_id, "c");
+        assert_eq!(cfg.whatsapp.as_ref().unwrap().endpoint, "http://e");
     }
 }

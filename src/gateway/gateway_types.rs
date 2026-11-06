@@ -40,6 +40,7 @@ pub trait Adapter: Send + Sync {
 }
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub struct GatewayClient {
     pub base_url: String,
     pub token: Option<String>,
@@ -49,4 +50,10 @@ impl GatewayClient {
     pub fn new(base_url: impl Into<String>, token: Option<String>) -> Self {
         Self { base_url: base_url.into(), token }
     }
+}
+
+pub struct HealthCheck {
+    pub adapter: String,
+    pub healthy: bool,
+    pub checked_at: i64,
 }

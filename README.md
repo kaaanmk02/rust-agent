@@ -5,8 +5,15 @@ Rust-based agent gateway with HTTP/WebSocket server, multi-channel adapters, and
 ## Status
 
 - Build: `cargo check` passes
-- Tests: 2 passing
+- Tests: passing
 - Latest push: `master` branch on `https://github.com/kaaanmk02/rust-agent.git`
+
+## Why this instead of Hermes-style agents
+
+- Speed: this gateway is purpose-built, single-process, and async Rust; it avoids interpreter/agent runtime overhead and is faster for routing chat/tool traffic end-to-end.
+- RAM: minimal baseline vs. a model-backed agent runtime. Hermes adds model/provider/session/tool runtime memory; this gateway stays lightweight unless adapters/tools grow.
+- Use this when you want: deterministic routing, low-latency chat/tool forwarding, embedded CLI, and optional auth.
+- Use Hermes-style agents when you want: autonomous reasoning, tool-use loops, provider fallback, and multi-step planning.
 
 ## Tech Stack
 
@@ -25,12 +32,12 @@ This project implements an agent gateway service in Rust. The gateway exposes HT
 
 Key modules:
 
-- `src/main.rs` - Entry point with `clap` CLI: `serve`, `send`, `tools`
+- `src/main.rs` - Entry point with `clap` CLI: `serve`, `send`, `tools`, `tools execute`, `config`
 - `src/gateway/server.rs` - Axum HTTP server with routes: `/health`, `/ws`, `/api/chat`, `/api/tools`, `/channels`, `/api/gateway/config`; includes CORS, auth middleware, and WebSocket broadcast via `tokio::sync::broadcast`
 - `src/gateway/gateway_types.rs` - Core types: `IncomingMessage`, `OutgoingMessage`, `ChannelEnvelope`, `DeliveryReceipt`, `GatewayClient`, and `Adapter` trait
 - `src/gateway/gateway_config.rs` - Configuration structs for `GatewayConfig`, `TelegramConfig`, `DiscordConfig`, `SlackConfig`, `WhatsAppConfig`, `McpConfig`
 - `src/gateway/adapters.rs` - Adapter implementations: `TelegramAdapter`, `DiscordAdapter`, `SlackAdapter`, `WhatsAppAdapter`
-- `src/gateway/middleware.rs` - `auth_middleware` validating `Authorization: Bearer <token>` or `?token=` query against `GATEWAY_AUTH_TOKEN`
+- `src/gateway/middleware.rs` - `auth_middleware` validating `Authorization: Bearer *** or `?token=` query against `GATEWAY_AUTH_TOKEN`
 - `src/gateway/ws.rs` - WebSocket upgrade handler broadcasting messages to connected clients
 - `src/gateway/cli.rs` - CLI command definitions
 
@@ -47,8 +54,16 @@ Runtime behavior:
 ```
 cargo run -- serve --listen 0.0.0.0:9090
 cargo run -- send --url http://localhost:9090 --channel telegram --to 123 --text "hello"
-cargo run -- tools
+cargo run -- tools --url http://localhost:9090
+cargo run -- tools execute --url http://localhost:9090 --tool shell --args '{"cmd":"date"}'
+cargo run -- config --file gateway.json --set listen=0.0.0.0:9090
 ```
+
+## Performance: rust-agent vs Hermes-style agent runtimes
+
+- rust-agent: single-process async Rust gateway; chat/tool forwarding is lightweight and avoids model-invocation scheduling. Baseline RAM is typically lower than an agent runtime with provider sessions.
+- Hermes-style agent runtime: adds model/provider/session/tool orchestration and memory. It trades higher RAM for reasoning, fallback, planning, and multi-step tool loops.
+- Expect rust-agent to be faster for routing/CLI tasks; expect Hermes to use more RAM when reasoning, sessions, or provider backends are active.
 
 ## Environment
 

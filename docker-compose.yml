@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  gateway:
+    build: .
+    ports: ["9090:9090"]
+    volumes: ["./gateway.json:/app/gateway.json"]
+    environment:
+      - RUST_LOG=info

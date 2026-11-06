@@ -1,0 +1,179 @@
+openapi: 3.0.0
+info:
+  title: rust-agent
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /ready:
+    get:
+      summary: Readiness check
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /version:
+    get:
+      summary: Version info
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /api/chat:
+    post:
+      summary: Send chat message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/tools:
+    get:
+      summary: List available tools
+      responses:
+        '200':
+          description: Tool list
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/tools/execute:
+    post:
+      summary: Execute a tool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolExecRequest'
+      responses:
+        '200':
+          description: Tool result
+          content:
+            application/json:
+              schema:
+                type: object
+  /channels:
+    get:
+      summary: List configured channels
+      responses:
+        '200':
+          description: Channel list
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/gateway/config:
+    post:
+      summary: Update gateway config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Config updated
+          content:
+            application/json:
+              schema:
+                type: object
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      responses:
+        '200':
+          description: Metrics text
+          content:
+            text/plain:
+              schema:
+                type: string
+  /audit:
+    get:
+      summary: Recent audit log
+      responses:
+        '200':
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                type: object
+  /health/adapters:
+    get:
+      summary: Adapter health status
+      responses:
+        '200':
+          description: Adapter health
+          content:
+            application/json:
+              schema:
+                type: object
+  /shutdown:
+    post:
+      summary: Trigger graceful shutdown
+      responses:
+        '200':
+          description: Shutdown accepted
+  /docs:
+    get:
+      summary: Docs endpoint placeholder
+      responses:
+        '200':
+          description: OK
+  /openapi.json:
+    get:
+      summary: OpenAPI document
+      responses:
+        '200':
+          description: OpenAPI JSON
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - channel
+        - chat_id
+        - text
+      properties:
+        channel:
+          type: string
+        chat_id:
+          type: string
+        text:
+          type: string
+    ToolExecRequest:
+      type: object
+      required:
+        - tool
+      properties:
+        tool:
+          type: string
+        args:
+          type: object

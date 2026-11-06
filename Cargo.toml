@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+chrono = "0.4"
+backoff = "0.4"
+jsonwebtoken = "9"
 anyhow = "1"
 axum = { version = "0.7", features = ["macros", "ws", "json", "http1", "http2"] }
 clap = { version = "4", features = ["derive"] }
@@ -14,7 +17,16 @@ async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.5", features = ["cors"] }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+tower = "0.5"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1", features = ["v4"] }
+notify = "6"
+lru = "0.12"
+prometheus = "0.13"
+lazy_static = "1.4"
+utoipa = { version = "4", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "10", features = ["axum"] }
+validator = { version = "0.16", features = ["derive"] }
+rusqlite = { version = "0.31", features = ["bundled"] }
